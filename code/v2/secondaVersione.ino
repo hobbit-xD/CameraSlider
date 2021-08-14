@@ -1,12 +1,10 @@
 // Include Library
 #include <Wire.h>
-#include <SPI.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 #include <AccelStepper.h>
 #include <MultiStepper.h>
 
-#include "bitmap.h"
 #include "costanti.h"
 #include "funzioni.h"
 
@@ -17,7 +15,6 @@ void setup() {
   myStepper1.setSpeed(200);
   myStepper2.setMaxSpeed(3000);
   myStepper2.setSpeed(200);
-  Serial.begin(9600);
   steppers.addStepper(myStepper1);
   steppers.addStepper(myStepper2);
 
@@ -27,13 +24,14 @@ void setup() {
   attachInterrupt (digitalPinToInterrupt(pinButton), changeSection, RISING); // SW connected to D3
 
   display.begin(SSD1306_SWITCHCAPVCC, 0x3C);
-  display.clearDisplay();
 
-  //display Boot logo
-  display.drawBitmap(0, 0, CamSlider, 128, 64, 1);
+  display.setTextSize(1.5);
+  display.setTextColor(WHITE);
+  display.clearDisplay();
+  display.print("Camera Slider");
   display.display();
   delay(2000);
-  display.clearDisplay();
+
 
   Home();
 }
@@ -42,7 +40,8 @@ void loop() {
 
   updateMainMenu();
   confirmed = false;                                //Both used to confirm button push to select mode
-  menuPosition = 1;                                           //Encoder starts from 0, first menu option
+  menuPosition = 1;  //Encoder starts from 0, first menu option
+
 
   while (!confirmed)                                        //While the user has not confirmed the selection
   {
@@ -61,24 +60,24 @@ void loop() {
 
   }
 
-  Serial.println(flag);
-
-  if (flag == 1) {
-    Serial.println("Ciao");
+  if (menuPosition == 1) {
     runTrack();
-  } else if (flag == 2)
+  } else if (menuPosition == 2)
     loopTracking();
 
 }
 
 void runTrack() {
   flag = 0;
+
   if (flag == 0) {
 
     display.clearDisplay();
-    display.drawBitmap(0, 0, BeginSetup, 128, 64, 1);
+
+    display.setCursor(10, 28);
+    display.print("Inizio");
     display.display();
-    setspeed = 2000;
+    speedValue = 2000;
     delay(500);
     flag = flag + 1;
   }
@@ -86,8 +85,6 @@ void runTrack() {
   if (flag == 1) {
     //Move Xaxis start position
     display.clearDisplay();
-    display.setTextSize(2);
-    display.setTextColor(WHITE);
     display.setCursor(10, 28);
     display.println("Set X In");
     display.display();
@@ -101,8 +98,6 @@ void runTrack() {
   if (flag == 2) {
     //Move Yaxis start position
     display.clearDisplay();
-    display.setTextSize(2);
-    display.setTextColor(WHITE);
     display.setCursor(10, 28);
     display.println("Set Y In");
     display.display();
@@ -119,8 +114,6 @@ void runTrack() {
     //Move Xaxis end position
 
     display.clearDisplay();
-    display.setTextSize(2);
-    display.setTextColor(WHITE);
     display.setCursor(10, 28);
     display.println("Set X Out");
     display.display();
@@ -135,8 +128,6 @@ void runTrack() {
     //Move Yaxis end position
 
     display.clearDisplay();
-    display.setTextSize(2);
-    display.setTextColor(WHITE);
     display.setCursor(10, 28);
     display.println("Set Y Out");
     display.display();
@@ -155,7 +146,7 @@ void runTrack() {
 
     display.clearDisplay();
     display.setCursor(8, 28);
-    display.println(" Preview  ");
+    display.println("Preview");
     display.display();
 
     myStepper1.setMaxSpeed(3000);
@@ -169,12 +160,14 @@ void runTrack() {
     display.setCursor(8, 28);
     display.println("Speed");
     display.display();
+    delay(250);
+    flag = flag + 1;
 
   }
   if (flag == 6)
   {
     display.clearDisplay();
-    SetSpeed();
+    chooseSpeed();
   }
 
   if (flag == 7)
@@ -183,6 +176,7 @@ void runTrack() {
     display.setCursor(30, 27);
     display.println("Start");
     display.display();
+    flag = flag + 1;
   }
 
   if (flag == 8) {
@@ -190,13 +184,14 @@ void runTrack() {
 
     display.clearDisplay();
     display.setCursor(20, 27);
-    display.println("Running");
+    display.print("Running");
     display.display();
 
     goToPosition[0] = XendPoint;
     goToPosition[1] = YendPoint;
 
-    myStepper1.setMaxSpeed(setspeed);
+    myStepper1.setMaxSpeed(speedValue);
+
     steppers.moveTo(goToPosition);
     steppers.runSpeedToPosition();
 
@@ -208,10 +203,10 @@ void runTrack() {
     display.setCursor(24, 26);
     display.println("Finish");
     display.display();
+    flag = flag + 1;
   }
   if (flag == 10) {
     //Torno alla home
-    Serial.println("Torno alla home");
     display.clearDisplay();
 
     Home();
@@ -221,19 +216,20 @@ void runTrack() {
 }
 void loopTracking() {
   flag = 0;
-  confirmed = false;
+
+
+
   if (flag == 0) {
 
     display.clearDisplay();
-    display.drawBitmap(0, 0, BeginSetup, 128, 64, 1);
+    display.print("Inizio");
     display.display();
-    setspeed = 2000;
+    speedValue = 2000;
+    flag = flag + 1;
   }
   if (flag == 1) {
     //Move Xaxis start position
     display.clearDisplay();
-    display.setTextSize(2);
-    display.setTextColor(WHITE);
     display.setCursor(10, 28);
     display.println("Set X In");
     display.display();
@@ -247,8 +243,6 @@ void loopTracking() {
   if (flag == 2) {
     //Move Yaxis start position
     display.clearDisplay();
-    display.setTextSize(2);
-    display.setTextColor(WHITE);
     display.setCursor(10, 28);
     display.println("Set Y In");
     display.display();
@@ -265,8 +259,6 @@ void loopTracking() {
     //Move Xaxis end position
 
     display.clearDisplay();
-    display.setTextSize(2);
-    display.setTextColor(WHITE);
     display.setCursor(10, 28);
     display.println("Set X Out");
     display.display();
@@ -281,8 +273,6 @@ void loopTracking() {
     //Move Yaxis end position
 
     display.clearDisplay();
-    display.setTextSize(2);
-    display.setTextColor(WHITE);
     display.setCursor(10, 28);
     display.println("Set Y Out");
     display.display();
@@ -301,7 +291,7 @@ void loopTracking() {
 
     display.clearDisplay();
     display.setCursor(8, 28);
-    display.println(" Preview  ");
+    display.println("Preview");
     display.display();
 
     myStepper1.setMaxSpeed(3000);
@@ -315,12 +305,13 @@ void loopTracking() {
     display.setCursor(8, 28);
     display.println("Speed");
     display.display();
+    flag = flag + 1;
 
   }
   if (flag == 6)
   {
     display.clearDisplay();
-    SetSpeed();
+    chooseSpeed();
   }
 
   if (flag == 7)
@@ -329,21 +320,24 @@ void loopTracking() {
     display.setCursor(30, 27);
     display.println("Start");
     display.display();
+    flag = flag + 1;
   }
 
   if (flag == 8) {
     // Ora faccio procedo con lo slider vero e proprio
-
+    confirmed = false;
     display.clearDisplay();
     display.setCursor(20, 27);
-    display.println("Running Loop");
+    display.print("Running Loop");
+    display.setCursor(20, 37);
+    display.print(confirmed);
     display.display();
 
     while (!confirmed) {
       goToPosition[0] = XendPoint;
       goToPosition[1] = YendPoint;
 
-      myStepper1.setMaxSpeed(setspeed);
+      myStepper1.setMaxSpeed(speedValue);
       steppers.moveTo(goToPosition);
       steppers.runSpeedToPosition();
 
@@ -353,9 +347,6 @@ void loopTracking() {
       steppers.moveTo(goToPosition);
       steppers.runSpeedToPosition();
     }
-
-
-    flag = flag + 1;
   }
   if (flag == 9) {
     // Stampero sull' oled che ho finito.
@@ -363,10 +354,10 @@ void loopTracking() {
     display.setCursor(24, 26);
     display.println("Finish");
     display.display();
+    flag = flag + 1;
   }
   if (flag == 10) {
     //Torno alla home
-    Serial.println("Torno alla home");
     display.clearDisplay();
 
     Home();

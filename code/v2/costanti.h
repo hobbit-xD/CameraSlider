@@ -11,8 +11,6 @@
 #define Z_dirPin 4
 #define Z_stepPin 7
 
-#define SSD1306_LCDHEIGHT 64
-
 #define motorInterfaceType 1
 
 AccelStepper myStepper1(motorInterfaceType, X_stepPin, X_dirPin);
@@ -21,7 +19,6 @@ AccelStepper myStepper2(motorInterfaceType, Z_stepPin, Z_dirPin);
 MultiStepper steppers;
 
 Adafruit_SSD1306 display(OLED_RESET);
-
 
 int rotationdirection = 0;
 int menuPosition = 1;
@@ -38,9 +35,8 @@ long YendPoint;
 
 int selected = 0;
 long goToPosition[2];
-long totaldistance = 0;
+long totalDistance = 0;
 
-float setspeed;
-float motorspeed;
-float timeinsec;
-float timeinmins;
+long speedValue = 0;
+int motorSpeed = 0;
+int timeInSec = 0;

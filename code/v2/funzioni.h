@@ -107,6 +107,8 @@ void changeSection()
     confirmed = true;
 
   lastClick = millis();
+
+
 }
 
 void Home()
@@ -114,11 +116,11 @@ void Home()
   myStepper1.setMaxSpeed(3000);
   myStepper1.setSpeed(200);
 
-  //  Serial.println("Sto tornando alla home");
-
   if (digitalRead(limitSwitchLeft) == 1)
   {
-    display.drawBitmap(0, 0, Homing, 128, 64, 1);
+    display.clearDisplay();
+    display.setCursor(10, 28);
+    display.print("Homing");
     display.display();
   }
   while (digitalRead(limitSwitchLeft) == 1)
@@ -163,116 +165,11 @@ void joystickReading() {
   }
 }
 
-void SetSpeed()
-{
-  while ( flag == 6)
-  {
-    joystickReading();
-    if (turnDetected)
-    {
-      turnDetected = false;  // do NOT repeat IF loop until new rotation detected
-      if (rotationdirection == -1)
-      {
-        setspeed = setspeed + 30;
-      }
-      if (rotationdirection == 1)
-      {
-        setspeed = setspeed - 30;
-        if (setspeed < 0)
-        {
-          setspeed = 0;
-        }
-      }
-
-      display.clearDisplay();
-      display.setTextSize(1);
-      display.setTextColor(WHITE);
-      display.setCursor(30, 0);
-      display.print("Speed");
-
-      motorspeed = setspeed / 80;
-
-      display.setCursor(5, 16);
-      display.print(motorspeed);
-      display.print(" mm/s");
-
-      totaldistance = XendPoint - XstartPoint;
-      if (totaldistance < 0)
-      {
-        totaldistance = totaldistance * (-1);
-      }
-
-      timeinsec = (totaldistance / setspeed);
-      timeinmins = timeinsec / 60;
-
-      display.setCursor(35, 32);
-      display.print("Time");
-      display.setCursor(8, 48);
-      if (timeinmins > 1)
-      {
-        display.print(timeinmins);
-        display.print(" min");
-      }
-      else
-      {
-        display.print(timeinsec);
-        display.print(" sec");
-      }
-      display.display();
-    }
-
-    display.clearDisplay();
-    display.setTextSize(1);
-    display.setTextColor(WHITE);
-    display.setCursor(30, 0);
-    display.print("Speed");
-
-    motorspeed = setspeed / 80;
-
-    display.setCursor(5, 16);
-    display.print(motorspeed);
-    display.print(" mm/s");
-
-    totaldistance = XendPoint - XstartPoint;
-    if (totaldistance < 0)
-    {
-      totaldistance = totaldistance * (-1);
-    }
-
-    timeinsec = (totaldistance / setspeed);
-    timeinmins = timeinsec / 60;
-    display.setCursor(35, 32);
-    display.print("Time");
-    display.setCursor(8, 48);
-    if (timeinmins > 1)
-    {
-      display.print(timeinmins);
-      display.print(" min");
-    }
-    else
-    {
-      display.print(timeinsec);
-      display.print(" sec");
-    }
-    display.display();
-  }
-}
-
-
 void updateMainMenu()                               //Updates the display data for the main menu
 {
-  /*
-    //display.clearDisplay();                           //Clear display
-    //display.setTextSize(1);                           //Set the text size
-    display.setCursor(28, 4);
-    display.print("Camera Slider");
 
-    display.display();
-  */
   display.clearDisplay();
-  display.setTextSize(1);
   display.setCursor(28, 4);
-  display.setTextColor(WHITE);
   display.print("Camera Slider");
   display.setCursor(25, 20);                        //Set the display cursor position
   display.print("Track Object");                          //Set the display text
@@ -289,5 +186,49 @@ void updateMainMenu()                               //Updates the display data f
 
   display.setCursor(14, selected);                   //Set the display cursor position
   display.print(">");
+
+  display.setCursor(14, 50);                   //Set the display cursor position
+  display.print("Scelta:");
+  display.print(menuPosition);
   display.display();                           //Output the display text
+}
+
+void chooseSpeed() {
+
+  while (flag == 6) {
+
+    joystickReading();
+    if (turnDetected) {
+      turnDetected = false;
+      if (rotationdirection == -1) {
+        speedValue = speedValue + 30;
+      }
+      if (rotationdirection == 1) {
+        speedValue = speedValue - 30;
+        if (speedValue < 0)
+          speedValue = 0;
+      }
+    }
+
+    display.clearDisplay();
+    display.setCursor(30, 0);
+    display.print("Speed");
+
+    motorSpeed = speedValue / 80;
+    display.setCursor(5, 16);
+    display.print(motorSpeed);
+    display.print("mm/s");
+
+    totalDistance = abs(XendPoint - XstartPoint);
+
+    timeInSec = (totalDistance / speedValue);
+
+    display.setCursor(35, 32);
+    display.print("Time");
+    display.setCursor(8, 48);
+    display.print(timeInSec);
+    display.println("s");
+    display.display();
+
+  }
 }
