@@ -1,5 +1,7 @@
 # DIY Motorised CameraSlider with Object Tracking
 
+![Slider Photo](./slider_small.jpg)
+
 Component list:
 
 - 2040 Aluminium Extrusion 1000mm
